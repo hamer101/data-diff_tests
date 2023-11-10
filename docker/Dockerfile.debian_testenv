@@ -1,0 +1,14 @@
+FROM python:3.12-slim-bullseye
+
+ENV DATADIFF_GIT=https://github.com/prestodb/presto.git
+
+RUN apt-get update && apt-get install -y \
+    python3-dev libpq-dev wget unzip \
+    python3-setuptools gcc bc git \
+    && pip install --no-cache-dir poetry==1.1.13 \
+    && git clone $DATADIFF_GIT
+WORKDIR ./data-diff
+# For now while we are in heavy development we install the latest with Poetry
+# and execute directly with Poetry. Later, we'll move to the released Pip package.
+RUN poetry install
+ENTRYPOINT ["poetry", "run", "python3", "-m", "data_diff"]

@@ -1,0 +1,162 @@
+version: "3.8"
+
+services:
+    postgres-service:
+        container_name: postgres-container
+        image: postgres
+        hostname: postgres-server
+        # work_mem: less tmp files
+        # maintenance_work_mem: improve table-level op perf
+        # max_wal_size: allow more time before merging to heap
+        command: >
+            -c work_mem=1GB -c maintenance_work_mem=1GB -c max_wal_size=8GB
+        restart: always
+        volumes:
+            - postgresql-data:/var/lib/postgresql/data:delegated
+        ports:
+            - '5432:5432'
+        expose:
+            - '5432'
+        env_file:
+            - ./variables.env
+        tty: true
+        networks:
+            - local
+
+    clickhouse-service:
+        container_name: clickhouse-container
+        image: clickhouse/clickhouse-server
+        hostname: clickhouse-server
+        restart: always
+        volumes:
+            - clickhouse-data:/var/lib/clickhouse:delegated
+        ulimits:
+            nproc: 65535
+            nofile:
+                soft: 262144
+                hard: 262144
+        ports:
+            - '8123:8123'
+            - '9000:9000'
+        expose:
+            - '8123'
+            - '9000'
+        env_file:
+            - ./variables.env
+        tty: true
+        networks:
+            - local
+
+    presto-service:
+        container_name: presto-container
+        hostname: presto-server
+        build:
+            context: .
+            dockerfile: ./Dockerfile.presto.0.284
+        volumes:
+            - ./volumes/configs/presto:/opt/presto/etc:ro
+        ports:
+            - '8080:8080'
+        tty: true
+        networks:
+            - local
+
+    trino-service:
+        container_name: trino-container
+        image: trinodb/trino
+        hostname: trino-server
+        ports:
+            - '8081:8081'
+            - '8082:8080'
+        volumes:
+            - ./volumes/configs/trino:/etc/trino:ro
+        networks:
+            - local
+
+    vertica-service:
+        container_name: vertica-container
+        image: vertica/vertica-ce
+        hostname: vertica-server
+        restart: always
+        volumes:
+            - vertica-data:/data:delegated
+        ports:
+            - '5433:5433'
+            - '5444:5444'
+        expose:
+            - '5433'
+            - '5444'
+        env_file:
+            - ./variables.env
+        tty: true
+        networks:
+            - local
+
+volumes:
+    postgresql-data:
+    clickhouse-data:
+    vertica-data:
+networks:
+    local:
+        driver: bridge
+
+
+
+
+
+
+
+
+
+# version: '3'
+
+# services:
+
+#     # clickhouse-server:
+#     #     image: clickhouse/clickhouse-server
+#     #     hostname: clickhouse-server
+#     #     container_name: clickhouse-container
+#     #     # ports:
+#     #     #     - 9001:9000
+#     #     network_mode: host #Available at localhost:8123
+#     #     volumes:
+#     #             - ./volumes/clickhouse/lib:/var/lib/clickhouse/
+#     #             - ./volumes/clickhouse/log:/var/log/clickhouse-server/
+#     #             - ./volumes/clickhouse/config/config.d:/etc/clickhouse-server/config.d/*.xml
+#     #             - ./volumes/clickhouse/config/users.d:/etc/clickhouse-server/users.d/*.xml
+#     #             - ./volumes/clickhouse/config/initdb.d:/docker-entrypoint-initdb.d/
+#     #     ulimits:
+#     #         nofile:
+#     #             soft: 262144
+#     #             hard: 262144
+
+#     # trino-server:
+#     #     image: trinodb/trino
+#     #     hostname: trino-server
+#     #     container_name: trino-container
+#     #     # network_mode: host #Available at localhost:8080
+
+#     #     ports:
+#     #         - 8080:8080
+#     #     volumes:
+#     #             - ./volumes/trino/etc:/etc/trino #If you mount this directory, your configuration is used instead of the default in the image.
+#     #     ulimits:
+#     #         nofile:
+#     #             soft: 128000
+#     #             hard: 128000
+
+#     presto-server:
+#         image: prestodb/presto:0.284 #prestodb/presto #the original dockerimage fails to get pulled: https://github.com/prestodb/presto/issues/21341
+#         hostname: presto-server
+#         container_name: presto-container
+#         network_mode: host #Available at localhost:9083
+#         volumes: 
+#             - ./volumes/presto/etc:/opt/presto-server/etc/
+#         ulimits:
+#             nofile:
+#                 soft: 128000
+#                 hard: 128000
+# # networks:
+# #     default:
+# #         external:
+# #             name: clickhouse-net
