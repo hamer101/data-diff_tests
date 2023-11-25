@@ -1,27 +1,36 @@
 version: "3.8"
 
-# x-redash-service: &redash
-#     image: redash/redash
-#     depends_on: 
-#         - postgres-redash
-#         - redis-redash
 x-redash-service: &redash-service-template
     image: redash/redash:latest
     depends_on:
         - redash-postgres-service
         - redash-redis-service
     env_file: ./variables.env
+    networks:
+        - data-diff-system
+    deploy:
+        resources:
+            limits:
+                cpus: '0.25'
+                memory: 1024M
+            reservations:
+                cpus: '0.15'
+                memory: 512M
     # restart: always
 
 services:
 
     redash-server-service:
         <<: *redash-service-template
-        command: server create_db
+        command: server 
         ports:
             - "5000:5000"
         environment:
             REDASH_WEB_WORKERS: 1
+
+    redash-temporary-createdb:
+        <<: *redash-service-template
+        command: create_db 
             
     redash-scheduler-service:
         <<: *redash-service-template
@@ -46,12 +55,17 @@ services:
 
     redash-redis-service:
         image: redis:5.0-alpine
+        networks:
+            - data-diff-system
     
     redash-postgres-service:
         image: postgres:9.6-alpine
         env_file: ./variables.env
         volumes:
             - postgres-redash-data:/var/lib/postgresql/data
+        networks:
+            - data-diff-system
+
 
     postgres-service:
         container_name: postgres-container
@@ -73,7 +87,7 @@ services:
             - ./variables.env
         tty: true
         networks:
-            - local
+            - data-diff-system
 
     clickhouse-service:
         container_name: clickhouse-container
@@ -97,7 +111,7 @@ services:
             - ./variables.env
         tty: true
         networks:
-            - local
+            - data-diff-system
 
     presto-service:
         container_name: presto-container
@@ -111,7 +125,7 @@ services:
             - '8080:8080'
         tty: true
         networks:
-            - local
+            - data-diff-system
 
     trino-service:
         container_name: trino-container
@@ -121,9 +135,9 @@ services:
             - '8081:8081'
             - '8082:8080'
         volumes:
-            - ./volumes/configs/trino:/etc/trino:ro
+            - ./volumes/configs/trino/etc:/etc/trino:ro
         networks:
-            - local
+            - data-diff-system
 
     vertica-service:
         container_name: vertica-container
@@ -142,7 +156,7 @@ services:
             - ./variables.env
         tty: true
         networks:
-            - local
+            - data-diff-system
 
 volumes:
     postgres-redash-data:
@@ -150,66 +164,5 @@ volumes:
     clickhouse-data:
     vertica-data:
 networks:
-    local:
+    data-diff-system:
         driver: bridge
-
-
-
-
-
-
-
-
-
-# version: '3'
-
-# services:
-
-#     # clickhouse-server:
-#     #     image: clickhouse/clickhouse-server
-#     #     hostname: clickhouse-server
-#     #     container_name: clickhouse-container
-#     #     # ports:
-#     #     #     - 9001:9000
-#     #     network_mode: host #Available at localhost:8123
-#     #     volumes:
-#     #             - ./volumes/clickhouse/lib:/var/lib/clickhouse/
-#     #             - ./volumes/clickhouse/log:/var/log/clickhouse-server/
-#     #             - ./volumes/clickhouse/config/config.d:/etc/clickhouse-server/config.d/*.xml
-#     #             - ./volumes/clickhouse/config/users.d:/etc/clickhouse-server/users.d/*.xml
-#     #             - ./volumes/clickhouse/config/initdb.d:/docker-entrypoint-initdb.d/
-#     #     ulimits:
-#     #         nofile:
-#     #             soft: 262144
-#     #             hard: 262144
-
-#     # trino-server:
-#     #     image: trinodb/trino
-#     #     hostname: trino-server
-#     #     container_name: trino-container
-#     #     # network_mode: host #Available at localhost:8080
-
-#     #     ports:
-#     #         - 8080:8080
-#     #     volumes:
-#     #             - ./volumes/trino/etc:/etc/trino #If you mount this directory, your configuration is used instead of the default in the image.
-#     #     ulimits:
-#     #         nofile:
-#     #             soft: 128000
-#     #             hard: 128000
-
-#     presto-server:
-#         image: prestodb/presto:0.284 #prestodb/presto #the original dockerimage fails to get pulled: https://github.com/prestodb/presto/issues/21341
-#         hostname: presto-server
-#         container_name: presto-container
-#         network_mode: host #Available at localhost:9083
-#         volumes: 
-#             - ./volumes/presto/etc:/opt/presto-server/etc/
-#         ulimits:
-#             nofile:
-#                 soft: 128000
-#                 hard: 128000
-# # networks:
-# #     default:
-# #         external:
-# #             name: clickhouse-net
