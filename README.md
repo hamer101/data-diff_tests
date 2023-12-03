@@ -29,7 +29,7 @@ Kept in the ```docker/variables.env``` as well as  are the following settings:
 | clickhouse-service               | ClickHouse                      | localhost:8123  | clickhouse| Password1                       | clickhouse      |
 | vertica-service                   | Vertica                         | localhost:5433  | dbadmin   | *No password*                       | vertica         |
 | presto-service                   | Presto                          | localhost:8080  |           |                                 |                 |
-| trino-service                    | Trino                          | localhost:8081  |           |                                 |                 |
+| trino-service                    | Trino                          | localhost:8082  |           |                                 |                 |
 | redash-server-service            | Redash Server                   | localhost:5000  | *To be configured manually* | *To be configured manually*|        |
 
 ### Configuring Redash
