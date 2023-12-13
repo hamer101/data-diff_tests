@@ -11,8 +11,8 @@ x-redash-service: &redash-service-template
     deploy:
         resources:
             limits:
-                cpus: '0.25'
-                memory: 1024M
+                cpus: '0.35'
+                memory: 4000M
             reservations:
                 cpus: '0.15'
                 memory: 512M
