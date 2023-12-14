@@ -9,7 +9,7 @@ CREATE TABLE student (
 	birthdate DATE,
 	deathdate DATE
 );
--- Nie obsługuje wywołania kilku query na raz jbc
+-- -- Musi otrzymać commit na koniec.
 INSERT INTO student (id, first_name, last_name, email, gender, birthdate, deathdate)
 VALUES
 (1,'Brittany','Swainston','bswainston0@wikipedia.org','Female','2006-10-12',NULL), 
@@ -1012,4 +1012,4 @@ VALUES
 (998,'Audrye','Natwick','anatwickrp@liveinternet.ru','Female','2007-05-09','2001-05-25'), 
 (999,'Alleen','Cappineer','acappineerrq@vinaora.com','Female','2022-10-19','2018-04-15'), 
 (1000,'Sue','Kinkaid','skinkaidrr@gravatar.com','Non-binary','2021-12-29','2007-06-09');
-
+COMMIT;

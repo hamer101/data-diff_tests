@@ -12,7 +12,8 @@ CREATE TABLE student (
 );
                        
 INSERT INTO student (id, first_name, last_name, email, gender, birthdate, deathdate)
-VALUES (1, 'Brittany', 'Swainston', 'bswainston0@wikipedia.org', 'Female', '10/12/2006', '8/6/2022'),
+VALUES 
+(1, 'Brittany', 'Swainston', 'bswainston0@wikipedia.org', 'Female', '10/12/2006', '8/6/2022'),
 (2, 'Reinald', 'Guerri', 'rguerri1@disqus.com', 'Male', '2/24/2022', '11/19/2017'),
 (3, 'Kele', 'Batterbee', 'kbatterbee2@dion.ne.jp', 'Male', '6/28/2014', '6/7/2017'),
 (4, 'Loise', 'Readhead', 'lreadhead3@hc360.com', 'Bigender', '7/13/2014', '10/18/2007'),

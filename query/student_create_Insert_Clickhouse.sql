@@ -5,16 +5,14 @@ CREATE TABLE clickhouse.student (
 	email String NOT NULL,
 	gender String NOT NULL,
 	birthdate DATE  NOT NULL,
-	deathdate DATE
+	deathdate Nullable(DATE)
 )
-
 ENGINE = MergeTree()
 PRIMARY KEY (id)
 
 -- Nie obsługuje wywołania kilku query na raz jbc
 
-INSERT INTO clickhouse.student (id, first_name, last_name, email, gender, birthdate, deathdate)
-VALUES
+INSERT INTO clickhouse.student (id, first_name, last_name, email, gender, birthdate, deathdate) VALUES
 (1,'Brittany','Swainston','bswainston0@wikipedia.org','Female','2006-10-12',NULL), 
 (2,'Reinald','Guerri','rguerri1@disqus.com','Male','2022-02-24','2017-11-19'), 
 (3,'Kele','Batterbee','kbatterbee2@dion.ne.jp','Male','2014-06-28','2017-06-07'), 
